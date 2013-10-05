@@ -1,0 +1,12 @@
+@users = User.find(:all)
+@users.sort! { |a,b| a.name.downcase <=> b.name.downcase } 	#destructive and downcases first
+@users.sort! { |a,b| a.login_count <=> b.login_count }		#another example
+
+
+Client.order("created_at DESC")
+# OR
+Client.order("created_at ASC")
+
+Client.order("orders_count ASC, created_at DESC")
+# OR
+Client.order("orders_count ASC", "created_at DESC")
