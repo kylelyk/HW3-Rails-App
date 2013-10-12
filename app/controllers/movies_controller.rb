@@ -15,28 +15,45 @@ class MoviesController < ApplicationController
   end
 
   def index
+    debugger
     #restore the ratings settings if all are unchecked
     if(params[:ratings] == {})
       params[:ratings] = session[:ratings]
     end
+
+    
     
     #overwrite all session parameters that were passed in params
     params.each {|elt, value| session[elt] = value}
-
+    
+    #clean up params so URL doesn't get crowded
+    if(params.keys.length >2)
+      flash.keep
+      
+      redirect_to movies_path
+      return
+    end
     @all_ratings = Movie.ratings
+
+    #if the session has no stored ratings, set up session[:ratings]
+    #this is necessary because the view relies on this for the checkboxes
+    if(!session[:ratings])
+      session[:ratings] = {}
+      @all_ratings.each {|elt| session[:ratings][elt] = nil} 
+    end
     
     #sorting by title or release
     if(session.has_key?(:sorting))
     	@movies = Movie.order("#{session[:sorting]}")
     else
 	    @movies = Movie.all
-    end
+    end 
 
-    #filtering by rating
-    if(session.has_key?(:ratings))
-      @ratings = session[:ratings].keys
-      @movies = @movies.keep_if{|elem| @ratings.include?(elem.rating)}
-    end
+    
+
+    #filtering by rating (there will always be atleast one)
+    @ratings = session[:ratings].keys
+    @movies = @movies.keep_if{|elem| @ratings.include?(elem.rating)}
   end
 
   def new
@@ -44,7 +61,6 @@ class MoviesController < ApplicationController
   end
 
   def create
-    #debugger
     @movie = Movie.create!(params[:movie])
     flash[:notice] = "#{@movie.title} was successfully created."
     redirect_to movies_path
