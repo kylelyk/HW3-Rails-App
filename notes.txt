@@ -10,3 +10,10 @@ Client.order("created_at ASC")
 Client.order("orders_count ASC, created_at DESC")
 # OR
 Client.order("orders_count ASC", "created_at DESC")
+
+
+%a{ :href => 'http://www.mozilla.com/en-US/firefox/' }
+
+%a(title=@title href=href) Stuff
+%a{:title => @title, :href => href} Stuff
+%a(title=@title){:href => @link.href} Stuff
